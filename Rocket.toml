@@ -1,0 +1,3 @@
+[global]
+mediator_uri = "http://localhost:8080"
+player_name = "Rust rocks"
