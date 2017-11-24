@@ -29,7 +29,7 @@ pub type GameStateMutex = Arc<Mutex<GameState>>;
 #[derive(Deserialize, Debug)]
 pub struct Map {
     #[serde(rename="map")]
-    content: Vec<Vec<i64>>,
+    pub content: Vec<Vec<i64>>,
 }
 impl Map {
     pub fn apply_move(&mut self, player_move: &PlayerMove) {
