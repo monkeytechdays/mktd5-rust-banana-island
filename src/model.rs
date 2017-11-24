@@ -86,63 +86,63 @@ mod map_should {
     #[test]
     fn do_nothing_when_applying_move_None() {
         let mut map = Map { content: vec![vec![0, 0, 0], vec![0, 3, 0], vec![0, 0, 0]] };
-        map.apply_move(PlayerMove { id: 3, direction: Move::None });
+        map.apply_move(&PlayerMove { id: 3, direction: Move::None });
         assert_eq!(vec![vec![0, 0, 0], vec![0, 3, 0], vec![0, 0, 0]], map.content);
     }
 
     #[test]
     fn move_up_when_applying_move_North() {
         let mut map = Map { content: vec![vec![0, 0, 0], vec![0, 3, 0], vec![0, 0, 0]] };
-        map.apply_move(PlayerMove { id: 3, direction: Move::North });
+        map.apply_move(&PlayerMove { id: 3, direction: Move::North });
         assert_eq!(vec![vec![0, 3, 0], vec![0, 0, 0], vec![0, 0, 0]], map.content);
     }
 
     #[test]
     fn move_left_when_applying_move_West() {
         let mut map = Map { content: vec![vec![0, 0, 0], vec![0, 3, 0], vec![0, 0, 0]] };
-        map.apply_move(PlayerMove { id: 3, direction: Move::West });
+        map.apply_move(&PlayerMove { id: 3, direction: Move::West });
         assert_eq!(vec![vec![0, 0, 0], vec![3, 0, 0], vec![0, 0, 0]], map.content);
     }
 
     #[test]
     fn move_down_when_applying_move_South() {
         let mut map = Map { content: vec![vec![0, 0, 0], vec![0, 3, 0], vec![0, 0, 0]] };
-        map.apply_move(PlayerMove { id: 3, direction: Move::South });
+        map.apply_move(&PlayerMove { id: 3, direction: Move::South });
         assert_eq!(vec![vec![0, 0, 0], vec![0, 0, 0], vec![0, 3, 0]], map.content);
     }
 
     #[test]
     fn move_right_when_applying_move_East() {
         let mut map = Map { content: vec![vec![0, 0, 0], vec![0, 3, 0], vec![0, 0, 0]] };
-        map.apply_move(PlayerMove { id: 3, direction: Move::East });
+        map.apply_move(&PlayerMove { id: 3, direction: Move::East });
         assert_eq!(vec![vec![0, 0, 0], vec![0, 0, 3], vec![0, 0, 0]], map.content);
     }
 
     #[test]
     fn do_nothing_when_applying_move_North_on_north_border() {
         let mut map = Map { content: vec![vec![0, 3, 0], vec![0, 0, 0], vec![0, 0, 0]] };
-        map.apply_move(PlayerMove { id: 3, direction: Move::North });
+        map.apply_move(&PlayerMove { id: 3, direction: Move::North });
         assert_eq!(vec![vec![0, 3, 0], vec![0, 0, 0], vec![0, 0, 0]], map.content);
     }
 
     #[test]
     fn do_nothing_when_applying_move_West_on_west_border() {
         let mut map = Map { content: vec![vec![0, 0, 0], vec![3, 0, 0], vec![0, 0, 0]] };
-        map.apply_move(PlayerMove { id: 3, direction: Move::West });
+        map.apply_move(&PlayerMove { id: 3, direction: Move::West });
         assert_eq!(vec![vec![0, 0, 0], vec![3, 0, 0], vec![0, 0, 0]], map.content);
     }
 
     #[test]
     fn do_nothing_when_applying_move_South_on_south_border() {
         let mut map = Map { content: vec![vec![0, 0, 0], vec![0, 0, 0], vec![0, 3, 0]] };
-        map.apply_move(PlayerMove { id: 3, direction: Move::South });
+        map.apply_move(&PlayerMove { id: 3, direction: Move::South });
         assert_eq!(vec![vec![0, 0, 0], vec![0, 0, 0], vec![0, 3, 0]], map.content);
     }
 
     #[test]
     fn do_nothing_when_applying_move_East_on_east_border() {
         let mut map = Map { content: vec![vec![0, 0, 0], vec![0, 0, 3], vec![0, 0, 0]] };
-        map.apply_move(PlayerMove { id: 3, direction: Move::East });
+        map.apply_move(&PlayerMove { id: 3, direction: Move::East });
         assert_eq!(vec![vec![0, 0, 0], vec![0, 0, 3], vec![0, 0, 0]], map.content);
     }
 }
