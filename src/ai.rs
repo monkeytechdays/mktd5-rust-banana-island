@@ -1,4 +1,4 @@
-use super::model::{GameState, Move};
+use super::model::{Game, Move};
 
 pub type AI = StandStill;
 
@@ -10,7 +10,7 @@ impl StandStill {
         }
     }
 
-    pub fn play(&mut self, _game: &mut GameState) -> Move {
+    pub fn play(&mut self, _game: &mut Game) -> Move {
         Move::None
     }
 }

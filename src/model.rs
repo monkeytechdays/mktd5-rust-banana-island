@@ -1,30 +1,15 @@
-use std::sync::{Arc, Mutex};
 use serde::{Deserialize, Deserializer};
 
-#[derive(Default, Debug)]
-pub struct GameState {
-    player_id: Option<i64>,
-    map: Option<Map>,
+#[derive(Debug)]
+pub struct Game {
+    pub player_id: i64,
+    pub map: Map,
 }
-impl GameState {
-    pub fn player_mut(&mut self) -> &mut Option<i64> {
-        &mut self.player_id
-    }
-
-    pub fn player(&self) -> i64 {
-        self.player_id.unwrap()
-    }
-
-    pub fn set_map(&mut self, map: Map) {
-        self.map = Some(map);
-    }
-
+impl Game {
     pub fn map_mut(&mut self) -> &mut Map {
-        (&mut self.map).as_mut().unwrap()
+        &mut self.map
     }
 }
-
-pub type GameStateMutex = Arc<Mutex<GameState>>;
 
 
 #[derive(Deserialize, Debug)]

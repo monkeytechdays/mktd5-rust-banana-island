@@ -4,7 +4,8 @@ use hyper::{Client, Method, Request, StatusCode};
 use hyper::header::{ContentLength, ContentType};
 use serde_json;
 
-use super::model::{GameStateMutex, Move, PlayerMove};
+use super::model::{Move, PlayerMove};
+use super::server::{GameState, GameStateMutex};
 
 pub struct Mediator {
     base_uri: String,
@@ -42,10 +43,10 @@ impl Mediator {
                                       player_id = number.as_i64();
                                   }
 
-                                  if player_id.is_some() {
+                                  if let Some(player_id) = player_id {
                                       let mut game = game_mutex.lock().unwrap();
-                                      *game.player_mut() = player_id;
-                                      println!("Registred as {}", player_id.unwrap());
+                                      *game = GameState::Registred(player_id);
+                                      println!("Registred as {}", player_id);
                                   } else {
                                       //TODO Stop process if can't read player_id
                                       eprintln!("Unable to register player");
@@ -87,9 +88,17 @@ impl Mediator {
                                match res.status() {
                                    StatusCode::NoContent => {
                                        let mut game = game_mutex.lock().unwrap();
-                                       let id = game.player();
-                                       game.map_mut().apply_move(&PlayerMove { id, direction });
-                                       println!("Send move: {:?}", direction);
+                                       let res = if let Some(mut game) = game.game_mut() {
+                                           let id = { game.player_id };
+                                           game.map_mut().apply_move(&PlayerMove { id, direction });
+                                           println!("Send move: {:?}", direction);
+                                           Ok(())
+                                       } else {
+                                           Err(())
+                                       };
+                                       if res.is_err() {
+                                           eprintln!("Inconsitent game state: {:?}", *game);
+                                       }
                                    }
                                    _ => {
                                        eprintln!("Invalid play (status={:?})", res.status());

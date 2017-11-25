@@ -2,11 +2,43 @@ use std::sync::{Arc, Mutex};
 
 use rocket::{self, Rocket, State};
 use rocket::fairing::{Info, Fairing, Kind};
+
 use rocket_contrib::Json;
 
-use super::model::{GameStateMutex, GameTick, Map};
+use super::model::{Game, GameTick, Map};
 use super::mediator;
 use super::ai::AI;
+
+
+#[derive(Debug)]
+pub enum GameState {
+    Registring,
+    Registred(i64),
+    Playing(Game),
+}
+impl GameState {
+    pub fn registred_player(&self) -> Option<i64> {
+        match self {
+            &GameState::Registred(player_id) => Some(player_id),
+            _                                => None,
+        }
+    }
+
+    pub fn game_mut(&mut self) -> Option<&mut Game> {
+        match self {
+            &mut GameState::Playing(ref mut game) => Some(game),
+            _                                     => None,
+        }
+    }
+}
+
+impl Default for GameState {
+    fn default() -> Self {
+        GameState::Registring
+    }
+}
+
+pub type GameStateMutex = Arc<Mutex<GameState>>;
 
 pub struct InvokeMediatorOnStart {
     game: GameStateMutex,
@@ -52,7 +84,9 @@ impl Fairing for InvokeMediatorOnStart {
 fn game_start(map: Json<Map>, _game_mutex: State<GameStateMutex>) {
     println!("Game start");
     let mut game = _game_mutex.lock().unwrap();
-    game.set_map(map.into_inner());
+    if let Some(player_id) = game.registred_player() {
+        *game = GameState::Playing(Game { player_id, map: map.into_inner() });
+    }
 }
 
 #[post("/map/<uuid>", data="<body>")]
@@ -65,8 +99,10 @@ fn game_tick(uuid: String, body: Json<GameTick>,
 
     if let Some(moves) = tick.moves().as_ref() {
         let mut game = game_mutex.lock().unwrap();
-        for player_move in moves {
-            game.map_mut().apply_move(&player_move);
+        if let GameState::Playing(ref mut game) = *game {
+            for player_move in moves {
+                game.map_mut().apply_move(&player_move);
+            }
         }
     }
 
@@ -76,10 +112,16 @@ fn game_tick(uuid: String, body: Json<GameTick>,
     ::std::thread::spawn(move || {
         let direction = {
             let mut game = game_mutex.lock().unwrap();
-            let mut ai = ai.lock().unwrap();
-            ai.play(&mut game)
+            if let GameState::Playing(ref mut game) = *game {
+                let mut ai = ai.lock().unwrap();
+                Some(ai.play(game))
+            } else {
+                None
+            }
         };
-        mediator.play(uuid, direction, game_mutex);
+        if let Some(direction) = direction {
+            mediator.play(uuid, direction, game_mutex);
+        }
     });
 }
 
